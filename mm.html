@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nischal Rijal | Developer & Designer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  
+  <style>
+    /* ── SYSTEM & VARIABLES ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1a1714;
+      --paper: #f4f0ea;
+      --accent: #b84a2e;
+      --muted: #7a7268; /* Slightly darker for better accessibility */
+      --line: #d9d3ca;
+      --transition: cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    ::selection { background: var(--accent); color: var(--paper); }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.125rem;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Subtle Grain Overlay */
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0.4;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ── LAYOUT UTILITIES ── */
+    .container { padding-inline: 5vw; }
+    section { padding-block: clamp(4rem, 10vh, 8rem); border-top: 1px solid var(--line); }
+
+    /* ── HEADER ── */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-block: 2.5rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .logo {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 300;
+      text-decoration: none;
+      color: inherit;
+    }
+    .logo em { font-style: italic; color: var(--accent); }
+
+    nav {
+      display: flex;
+      gap: clamp(1rem, 3vw, 2.5rem);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s var(--transition);
+    }
+    nav a:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    .hero {
+      border-top: none;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .hero-text h1 {
+      font-size: clamp(3.5rem, 10vw, 7rem);
+      font-weight: 300;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      margin-block: 1.5rem 2rem;
+    }
+    .hero-text h1 em { display: block; color: var(--accent); font-style: italic; }
+
+    .hero-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.4em 1em;
+      display: inline-block;
+    }
+
+    .hero-aside {
+      padding-left: clamp(2rem, 5vw, 4rem);
+      border-left: 1px solid var(--line);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3rem;
+    }
+
+    .stat-num { font-size: 3.5rem; color: var(--accent); font-weight: 300; line-height: 1; }
+    .stat-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; }
+
+    /* ── CONTENT GRID ── */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: clamp(2rem, 8vw, 6rem);
+    }
+
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      position: sticky;
+      top: 2rem;
+      height: fit-content;
+    }
+
+    /* ── SKILLS ── */
+    .skills-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+    .skill-card {
+      padding: 2rem;
+      border: 1px solid var(--line);
+      transition: all 0.4s var(--transition);
+    }
+    .skill-card:hover { border-color: var(--accent); background: white; transform: translateY(-5px); }
+
+    /* ── PROJECTS ── */
+    .project-item {
+      display: flex;
+      justify-content: space-between;
+      padding-block: 2.5rem;
+      border-bottom: 1px solid var(--line);
+      text-decoration: none;
+      color: inherit;
+      transition: opacity 0.3s;
+    }
+    .project-item:first-child { border-top: 1px solid var(--line); }
+    .project-item:hover { opacity: 0.7; }
+    .project-info h3 { font-size: 2rem; font-weight: 300; margin-bottom: 0.5rem; }
+    .project-tags { display: flex; gap: 0.5rem; margin-top: 1rem; font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--muted); }
+
+    /* ── CONTACT ── */
+    .contact-body h2 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 300; margin-bottom: 2rem; line-height: 1.1; }
+    .contact-links { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn {
+      padding: 1rem 2rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      text-decoration: none;
+      border: 1px solid var(--ink);
+      transition: 0.3s var(--transition);
+    }
+    .btn.primary { background: var(--ink); color: var(--paper); }
+    .btn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 3rem 5vw;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero, .content-grid { grid-template-columns: 1fr; }
+      .hero-aside { border-left: none; border-top: 1px solid var(--line); padding: 2rem 0 0; flex-direction: row; }
+      .section-label { position: static; margin-bottom: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+
+  <div class="container">
+    <header>
+      <a href="#" class="logo">N<em>ischal</em> Rijal</a>
+      <nav>
+        <a href="#about">About</a>
+        <a href="#skills">Work</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-text">
+          <span class="hero-tag">Availability: Q2 2026</span>
+          <h1>Building things <em>that matter.</em></h1>
+          <p style="max-width: 50ch; font-size: 1.4rem; font-weight: 300;">
+            A Developer & Designer crafting functional digital artifacts from the heart of Kathmandu.
+          </p>
+        </div>
+        <div class="hero-aside">
+          <div class="stat"><div class="stat-num">03+</div><div class="stat-label">Years of Craft</div></div>
+          <div class="stat"><div class="stat-num">20+</div><div class="stat-label">Ships Completed</div></div>
+        </div>
+      </section>
+
+      <section id="about" class="content-grid">
+        <div class="section-label">01 / Introduction</div>
+        <div class="about-body">
+          <p style="font-size: 1.5rem; font-weight: 300; margin-bottom: 2rem;">
+            I believe software should be as legible as poetry and as sturdy as architecture. Currently focusing on the intersection of <strong>User Experience</strong> and <strong>Scalable Systems</strong>.
+          </p>
+          <a href="#" class="btn">View Resume</a>
+        </div>
+      </section>
+
+      <section id="skills" class="content-grid">
+        <div class="section-label">02 / Expertise</div>
+        <div class="skills-list">
+          <div class="skill-card">
+            <span style="font-size: 1.5rem;">⚡</span>
+            <h3 style="font-weight: 400; margin: 1rem 0 0.5rem;">Frontend</h3>
+            <p style="font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted);">React, Next.js, TypeScript, Tailwind</p>
+          </div>
+          <div class="skill-card">
+            <span style="font-size: 1.5rem;">🛠</span>
+            <h3 style="font-weight: 400; margin: 1rem 0 0.5rem;">Backend</h3>
+            <p style="font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted);">Node.js, Python, PostgreSQL, Redis</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="projects" class="content-grid">
+        <div class="section-label">03 / Selected Work</div>
+        <div class="projects-list">
+          <a href="#" class="project-item">
+            <div class="project-info">
+              <h3>Project Alpha</h3>
+              <p style="color: var(--muted);">High-performance trading dashboard</p>
+              <div class="project-tags"><span>REACT</span> <span>D3.JS</span> <span>SOCKETS</span></div>
+            </div>
+            <div style="font-size: 1.5rem; color: var(--accent);">↗</div>
+          </a>
+          <a href="#" class="project-item">
+            <div class="project-info">
+              <h3>Project Beta</h3>
+              <p style="color: var(--muted);">Custom CMS for creative agencies</p>
+              <div class="project-tags"><span>NEXT.JS</span> <span>PRISMA</span> <span>AWS</span></div>
+            </div>
+            <div style="font-size: 1.5rem; color: var(--accent);">↗</div>
+          </a>
+        </div>
+      </section>
+
+      <section id="contact" class="content-grid">
+        <div class="section-label">04 / Contact</div>
+        <div class="contact-body">
+          <h2>Let's build the <em>next big thing</em> together.</h2>
+          <div class="contact-links">
+            <a href="mailto:hello@nischal.me" class="btn primary">Send an Email</a>
+            <a href="#" class="btn">LinkedIn</a>
+            <a href="#" class="btn">GitHub</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>© 2026 Nischal Rijal</span>
+      <span>43.5389° N, 14.2094° E</span> <span>Designed with Intent</span>
+    </footer>
+  </div>
+
+  <script>
+    // Smooth fade-in on scroll
+    const observerOptions = { threshold: 0.1 };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = "1";
+          entry.target.style.transform = "translateY(0)";
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('section').forEach(section => {
+      section.style.opacity = "0";
+      section.style.transform = "translateY(20px)";
+      section.style.transition = "all 0.8s cubic-bezier(0.23, 1, 0.32, 1)";
+      observer.observe(section);
+    });
+  </script>
+</body>
+</html>
