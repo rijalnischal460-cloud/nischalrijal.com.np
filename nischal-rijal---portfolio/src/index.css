@@ -13,10 +13,29 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
-  
+
   body {
     @apply bg-zinc-950 text-zinc-100;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  #root {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  * {
+    box-sizing: border-box;
   }
 }
 
@@ -24,4 +43,3 @@
   background: rgba(59, 130, 246, 0.2);
   color: white;
 }
-
