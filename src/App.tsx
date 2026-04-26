@@ -38,7 +38,7 @@ export default function App() {
 
         <Navbar onOpenResume={() => setIsResumeOpen(true)} />
 
-        <main className="w-full max-w-full overflow-x-hidden">
+        <main className="w-full max-w-full overflow-x-hidden min-h-screen h-auto">
           <Hero />
           <motion.div
             className="w-full max-w-full overflow-x-hidden"
