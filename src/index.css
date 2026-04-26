@@ -43,6 +43,18 @@
     isolation: isolate;
   }
 
+  section {
+    width: 100%;
+    max-width: 100%;
+    min-height: fit-content;
+  }
+
+  main {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+  }
+
   *,
   *::before,
   *::after {
