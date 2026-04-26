@@ -3,77 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Nischal Rijal Portfolio" />
     <title>Nischal | Portfolio</title>
-    <script>
-      (function() {
-        if (typeof window !== 'undefined') {
-          // Store original fetch
-          var originalFetch = window.fetch;
-          
-          // Create a handler that protects fetch
-          var handler = {
-            get: function(target, prop) {
-              if (prop === 'fetch') return originalFetch;
-              var val = target[prop];
-              if (typeof val === 'function' && val.bind) return val.bind(target);
-              return val;
-            },
-            set: function(target, prop, value) {
-              if (prop === 'fetch') return true; // Ignore
-              try { target[prop] = value; } catch (e) {}
-              return true;
-            }
-          };
-          
-          var proxy = new Proxy(window, handler);
-          
-          // Try to define global, self, and globalThis as the proxy
-          try {
-            Object.defineProperty(window, 'global', {
-              value: proxy,
-              configurable: true,
-              writable: false
-            });
-          } catch (e) { window.global = proxy; }
-          
-          try {
-            Object.defineProperty(window, 'globalThis', {
-              value: proxy,
-              configurable: true,
-              writable: false
-            });
-          } catch (e) { (window).globalThis = proxy; }
-
-          // Try to redefine 'self' as the proxy if configurable
-          try {
-            var descSelf = Object.getOwnPropertyDescriptor(window, 'self');
-            if (descSelf && descSelf.configurable) {
-              Object.defineProperty(window, 'self', {
-                get: function() { return proxy; },
-                configurable: true
-              });
-            }
-          } catch (e) {}
-          
-          // try to redefine fetch on window itself if configurable
-          try {
-            var desc = Object.getOwnPropertyDescriptor(window, 'fetch');
-            if (desc && desc.configurable) {
-              Object.defineProperty(window, 'fetch', {
-                get: function() { return originalFetch; },
-                set: function() { return true; },
-                configurable: true,
-                enumerable: true
-              });
-            }
-          } catch (e) {}
-        }
-      })();
-    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
