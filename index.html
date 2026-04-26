@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nischal | Portfolio</title>
+    <script>
+      (function() {
+        if (typeof window !== 'undefined') {
+          var originalFetch = window.fetch;
+          
+          // Protect fetch on window itself
+          try {
+            Object.defineProperty(window, 'fetch', {
+              get: function() { return originalFetch; },
+              set: function() { return true; }, // ignore assignment
+              configurable: true,
+              enumerable: true
+            });
+          } catch (e) {}
+
+          // Some libraries expect 'global'
+          if (!window.global) {
+            window.global = window;
+          }
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
