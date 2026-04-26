@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react(), tailwindcss()],
-    base: '/', // Custom domain (www.nischalrijal.com.np) should use root base
+    base: '/',
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
@@ -18,13 +18,13 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
+      outDir: 'docs',
+      emptyOutDir: true,
       modulePreload: {
         polyfill: false,
       },
     },
     server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modify—file watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
     },
   };
