@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-zinc-950: #09090b;
+  --color-zinc-900: #18181b;
+  --color-zinc-800: #27272a;
+  --color-zinc-400: #a1a1aa;
+  --color-zinc-500: #71717a;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+    overflow-x: clip;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    background-color: #ffffff;
+  }
+
+  html.dark {
+    background-color: #09090b;
+  }
+
+  body {
+    @apply bg-white text-black dark:bg-zinc-950 dark:text-zinc-100;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+    overflow-x: clip;
+    overscroll-behavior-x: none;
+  }
+
+  #root {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+    overflow-x: clip;
+    isolation: isolate;
+  }
+
+  section {
+    width: 100%;
+    max-width: 100%;
+    min-height: fit-content;
+  }
+
+  main {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    min-width: 0;
+  }
+
+  img,
+  video,
+  canvas,
+  svg,
+  iframe {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+::selection {
+  background: rgba(59, 130, 246, 0.2);
+  color: #fff;
+}
+
+/* Half-screen/mobile clipping safety */
+html,
+body,
+#root {
+  height: auto !important;
+  min-height: 100% !important;
+}
+
+body {
+  overflow-y: auto !important;
+}
+
+/* Only layout containers, not every div */
+main,
+section {
+  max-height: none;
+}
