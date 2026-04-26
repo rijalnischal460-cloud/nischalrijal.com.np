@@ -1,135 +1,166 @@
-import { motion, AnimatePresence } from 'motion/react';
-import { Moon, Sun, Menu, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { motion } from 'motion/react';
+import { Moon, Sun, Menu, X, FileText } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
-import { Button } from './Layout';
 
-export function Navbar({ onOpenResume }: { onOpenResume: () => void }) {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+interface NavbarProps {
+  onOpenResume: () => void;
+}
+
+const navItems = [
+  { label: 'About', href: '#about' },
+  { label: 'Skills', href: '#skills' },
+  { label: 'Projects', href: '#projects' },
+  { label: 'Focus', href: '#focus' },
+  { label: 'Interests', href: '#interests' },
+  { label: 'Contact', href: '#contact' },
+];
+
+export function Navbar({ onOpenResume }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setIsScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const navLinks = [
-    { name: 'About', href: '#about' },
-    { name: 'Skills', href: '#skills' },
-    { name: 'Projects', href: '#projects' },
-    { name: 'Contact', href: '#contact' },
-  ];
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  const closeMenu = () => setIsOpen(false);
+
+  const scrollToId = (href: string) => {
+    const id = href.replace('#', '');
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    closeMenu();
+  };
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed inset-x-0 top-0 z-50 w-full transition-all duration-300 ${
         isScrolled
-          ? 'py-4 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/10 shadow-sm'
-          : 'py-6 bg-transparent'
+          ? 'border-b border-black/5 bg-white/80 backdrop-blur-md dark:border-white/10 dark:bg-zinc-950/70'
+          : 'bg-transparent'
       }`}
     >
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 md:px-12">
-        <motion.a
-          href="#"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-2xl font-bold tracking-tighter text-black dark:text-white"
-          onClick={(e) => {
-            e.preventDefault();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
+      <nav className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-6 md:px-12">
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="text-4xl font-extrabold tracking-tight text-black dark:text-white"
+          aria-label="Go to top"
         >
           Nischal<span className="text-blue-600">.</span>
-        </motion.a>
+        </button>
 
-        {/* Desktop Nav */}
-        <nav className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              className="group relative text-sm font-medium text-zinc-700 transition-colors hover:text-black dark:text-zinc-300 dark:hover:text-white"
+        <div className="hidden items-center gap-2 md:flex">
+          {navItems.map((item) => (
+            <button
+              key={item.href}
+              onClick={() => scrollToId(item.href)}
+              className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-black/5 hover:text-black dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
             >
-              {link.name}
-              <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-blue-500 transition-all group-hover:w-full" />
-            </a>
+              {item.label}
+            </button>
           ))}
-          <div className="mx-2 h-4 w-px bg-zinc-300 dark:bg-white/10" />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onOpenResume}
-            className="rounded-full bg-black px-4 py-1.5 text-xs font-bold text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-zinc-950"
-          >
-            Resume
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleTheme}
-            className="h-10 w-10 rounded-full p-0"
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-          </Button>
-        </nav>
-
-        {/* Mobile Toggle */}
-        <div className="flex items-center gap-3 md:hidden">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleTheme}
-            className="h-10 w-10 rounded-full p-0"
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-          </Button>
           <button
-            onClick={() => setMobileMenuOpen((v) => !v)}
-            className="text-gray-700 dark:text-gray-200"
-            aria-label="Toggle mobile menu"
+            onClick={onOpenResume}
+            className="ml-1 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-black/5 hover:text-black dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
           >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            <FileText size={16} />
+            Resume
+          </button>
+          <button
+            onClick={toggleTheme}
+            className="ml-1 rounded-lg p-2 text-zinc-600 transition hover:bg-black/5 hover:text-black dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
         </div>
-      </div>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            className="border-b border-gray-200 bg-white dark:border-white/10 dark:bg-zinc-900 md:hidden"
+        <div className="flex items-center gap-2 md:hidden">
+          <button
+            onClick={toggleTheme}
+            className="rounded-lg p-2 text-zinc-600 transition hover:bg-black/5 hover:text-black dark:text-zinc-300 dark:hover:bg-white/10 dark:hover:text-white"
+            aria-label="Toggle theme"
           >
-            <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-6">
-              {navLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-lg font-medium text-gray-900 dark:text-gray-100"
-                >
-                  {link.name}
-                </a>
-              ))}
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenResume();
-                }}
-                className="text-left text-lg font-bold text-blue-600"
-              >
-                Resume
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+
+          <button
+            onClick={() => setIsOpen((v) => !v)}
+            className="rounded-lg p-2 text-zinc-700 transition hover:bg-black/5 dark:text-zinc-200 dark:hover:bg-white/10"
+            aria-label="Toggle menu"
+            aria-expanded={isOpen}
+          >
+            {isOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
+      </nav>
+
+      {isOpen && (
+        <motion.div
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={closeMenu}
+        />
+      )}
+
+      <motion.aside
+        className={`fixed right-0 top-0 z-50 h-dvh w-72 border-l border-black/10 bg-white shadow-xl dark:border-white/10 dark:bg-zinc-900 md:hidden ${
+          isOpen ? 'pointer-events-auto' : 'pointer-events-none'
+        }`}
+        initial={false}
+        animate={{ x: isOpen ? 0 : 320 }}
+        transition={{ type: 'tween', duration: 0.25 }}
+      >
+        <div className="flex h-20 items-center justify-between border-b border-black/5 px-5 dark:border-white/10">
+          <span className="text-lg font-semibold text-black dark:text-white">Menu</span>
+          <button
+            onClick={closeMenu}
+            className="rounded-lg p-2 text-zinc-700 hover:bg-black/5 dark:text-zinc-200 dark:hover:bg-white/10"
+            aria-label="Close menu"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="flex flex-col p-4">
+          {navItems.map((item) => (
+            <button
+              key={item.href}
+              onClick={() => scrollToId(item.href)}
+              className="rounded-lg px-3 py-3 text-left text-base font-medium text-zinc-700 transition hover:bg-black/5 hover:text-black dark:text-zinc-200 dark:hover:bg-white/10 dark:hover:text-white"
+            >
+              {item.label}
+            </button>
+          ))}
+
+          <button
+            onClick={() => {
+              onOpenResume();
+              closeMenu();
+            }}
+            className="mt-2 inline-flex items-center gap-2 rounded-lg px-3 py-3 text-left text-base font-medium text-zinc-700 transition hover:bg-black/5 hover:text-black dark:text-zinc-200 dark:hover:bg-white/10 dark:hover:text-white"
+          >
+            <FileText size={18} />
+            Resume
+          </button>
+        </div>
+      </motion.aside>
     </header>
   );
 }
