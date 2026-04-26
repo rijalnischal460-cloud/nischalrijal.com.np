@@ -30,7 +30,7 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen h-auto w-full max-w-full overflow-x-hidden bg-white font-sans text-black transition-colors duration-500 selection:bg-black/10 dark:bg-zinc-950 dark:text-white dark:selection:bg-white/20">
+      <div className="w-full max-w-full min-h-screen h-auto overflow-visible bg-white font-sans text-black transition-colors duration-500 selection:bg-black/10 dark:bg-zinc-950 dark:text-white dark:selection:bg-white/20">
         <motion.div
           className="fixed left-0 right-0 top-0 z-[60] h-[2px] origin-left bg-black dark:bg-white"
           style={{ scaleX }}
@@ -38,10 +38,10 @@ export default function App() {
 
         <Navbar onOpenResume={() => setIsResumeOpen(true)} />
 
-        <main className="w-full max-w-full overflow-x-hidden min-h-screen h-auto">
+        <main className="w-full max-w-full overflow-visible">
           <Hero />
           <motion.div
-            className="w-full max-w-full overflow-x-hidden"
+            className="w-full max-w-full overflow-visible"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, amount: 0.1 }}

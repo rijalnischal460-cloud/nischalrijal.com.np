@@ -77,3 +77,21 @@
   background: rgba(59, 130, 246, 0.2);
   color: #fff;
 }
+
+/* Half-screen/mobile clipping safety */
+html,
+body,
+#root {
+  height: auto !important;
+  min-height: 100% !important;
+}
+
+body {
+  overflow-y: auto !important;
+}
+
+/* Only layout containers, not every div */
+main,
+section {
+  max-height: none;
+}
