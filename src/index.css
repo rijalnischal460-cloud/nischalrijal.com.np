@@ -14,17 +14,23 @@
   html {
     width: 100%;
     max-width: 100%;
+    min-height: 100%;
     overflow-x: clip;
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    background-color: #ffffff;
+  }
+
+  html.dark {
+    background-color: #09090b;
   }
 
   body {
-    @apply bg-zinc-950 text-zinc-100;
+    @apply bg-white text-black dark:bg-zinc-950 dark:text-zinc-100;
     margin: 0;
     width: 100%;
     max-width: 100%;
-    min-height: 100vh;
+    min-height: 100%;
     overflow-x: clip;
     overscroll-behavior-x: none;
   }
@@ -32,7 +38,7 @@
   #root {
     width: 100%;
     max-width: 100%;
-    min-height: 100vh;
+    min-height: 100%;
     overflow-x: clip;
     isolation: isolate;
   }

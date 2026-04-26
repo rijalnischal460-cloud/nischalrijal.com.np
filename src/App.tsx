@@ -30,7 +30,7 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-white font-sans text-black transition-colors duration-500 selection:bg-black/10 dark:bg-zinc-950 dark:text-white dark:selection:bg-white/20">
+      <div className="min-h-screen h-auto w-full max-w-full overflow-x-hidden bg-white font-sans text-black transition-colors duration-500 selection:bg-black/10 dark:bg-zinc-950 dark:text-white dark:selection:bg-white/20">
         <motion.div
           className="fixed left-0 right-0 top-0 z-[60] h-[2px] origin-left bg-black dark:bg-white"
           style={{ scaleX }}
