@@ -10,9 +10,7 @@ export function Navbar({ onOpenResume }: { onOpenResume: () => void }) {
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -28,11 +26,11 @@ export function Navbar({ onOpenResume }: { onOpenResume: () => void }) {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'py-4 bg-white/70 dark:bg-black/70 backdrop-blur-xl border-bottom border-gray-200 dark:border-white/10 shadow-sm'
-          : 'py-8 bg-transparent'
+          ? 'py-4 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/10 shadow-sm'
+          : 'py-6 bg-transparent'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 md:px-12">
         <motion.a
           href="#"
           initial={{ opacity: 0 }}
@@ -47,41 +45,52 @@ export function Navbar({ onOpenResume }: { onOpenResume: () => void }) {
         </motion.a>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden items-center gap-8 md:flex">
           {navLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
-              className="text-sm font-medium text-zinc-400 hover:text-white transition-colors relative group"
+              className="group relative text-sm font-medium text-zinc-700 transition-colors hover:text-black dark:text-zinc-300 dark:hover:text-white"
             >
               {link.name}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full" />
+              <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-blue-500 transition-all group-hover:w-full" />
             </a>
           ))}
-          <div className="w-[1px] h-4 bg-white/10 mx-2" />
+          <div className="mx-2 h-4 w-px bg-zinc-300 dark:bg-white/10" />
           <Button
             variant="ghost"
             size="sm"
             onClick={onOpenResume}
-            className="px-4 py-1.5 bg-black dark:bg-white text-white dark:text-zinc-950 text-xs font-bold rounded-full hover:opacity-90 transition-opacity"
+            className="rounded-full bg-black px-4 py-1.5 text-xs font-bold text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-zinc-950"
           >
             Resume
           </Button>
-        </nav>
-
-        {/* Mobile Toggle */}
-        <div className="flex md:hidden items-center gap-4">
           <Button
             variant="ghost"
             size="sm"
             onClick={toggleTheme}
-            className="w-10 h-10 p-0 rounded-full"
+            className="h-10 w-10 rounded-full p-0"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </Button>
+        </nav>
+
+        {/* Mobile Toggle */}
+        <div className="flex items-center gap-3 md:hidden">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleTheme}
+            className="h-10 w-10 rounded-full p-0"
+            aria-label="Toggle theme"
           >
             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </Button>
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-gray-600 dark:text-gray-400"
+            onClick={() => setMobileMenuOpen((v) => !v)}
+            className="text-gray-700 dark:text-gray-200"
+            aria-label="Toggle mobile menu"
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -92,12 +101,12 @@ export function Navbar({ onOpenResume }: { onOpenResume: () => void }) {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-white/10 overflow-hidden"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="border-b border-gray-200 bg-white dark:border-white/10 dark:bg-zinc-900 md:hidden"
           >
-            <div className="flex flex-col gap-4 p-6">
+            <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 p-6">
               {navLinks.map((link) => (
                 <a
                   key={link.name}
@@ -113,7 +122,7 @@ export function Navbar({ onOpenResume }: { onOpenResume: () => void }) {
                   setMobileMenuOpen(false);
                   onOpenResume();
                 }}
-                className="text-lg font-bold text-blue-600 text-left"
+                className="text-left text-lg font-bold text-blue-600"
               >
                 Resume
               </button>
