@@ -4,8 +4,7 @@ import { Button } from '../components/ui/Layout';
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-[90vh] w-full max-w-full flex-col items-center justify-center pt-20 overflow-x-hidden overflow-y-visible">
-      {/* Background blobs */}
+    <section className="relative flex min-h-[70svh] w-full max-w-full flex-col items-center justify-center overflow-x-hidden overflow-y-visible pt-20 pb-16 md:min-h-[90vh]">
       <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-purple-200/30 blur-[120px] animate-pulse dark:bg-purple-900/10" />
       <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-indigo-200/30 blur-[120px] animate-pulse delay-700 dark:bg-indigo-900/10" />
 
