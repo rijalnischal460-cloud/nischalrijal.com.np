@@ -9,7 +9,7 @@ import { Hero } from './sections/Hero';
 import { About } from './sections/About';
 import { Skills } from './sections/Skills';
 import { Projects } from './sections/Projects';
-import { Focus } from './sections/Focus';
+import { CurrentFocus } from './sections/Focus';
 import { Interests } from './sections/Interests';
 import { Contact } from './sections/Contact';
 import { Resume } from './sections/Resume';
@@ -49,7 +49,7 @@ export default function App() {
             <About />
             <Skills />
             <Projects />
-            <Focus />
+            <CurrentFocus />
             <Interests />
             <Contact />
           </motion.div>
