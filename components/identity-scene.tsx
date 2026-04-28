@@ -1,3 +1,4 @@
+// ...existing code...
 "use client"
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
@@ -119,12 +120,7 @@ function PremiumCore({ scrollRef }: SceneProps) {
       {/* background particles */}
       <points>
         <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={starPositions.length / 3}
-            array={starPositions}
-            itemSize={3}
-          />
+          <bufferAttribute attach="attributes-position" args={[starPositions, 3]} />
         </bufferGeometry>
         <pointsMaterial color="#dbeafe" size={0.02} sizeAttenuation transparent opacity={0.88} />
       </points>
@@ -176,3 +172,4 @@ export function IdentityScene({
     </Canvas>
   )
 }
+// ...existing code...
