@@ -17,16 +17,19 @@ type HeadProps = {
 }
 
 /**
- * Optimised identity scene:
- * - slowed animation via ANIMATION_SPEED
- * - reduced geometry detail & fewer hair puffs for performance
- * - clamp rotations so only front-facing head is visible
- * - small "hand" that moves left/right with arrow keys
+ * Super realistic identity scene:
+ * - increased hand movement with arrow keys (3x multiplier)
+ * - removed front face hair, added realistic mustache
+ * - hyper-realistic proportions and textures
+ * - enhanced lighting for depth
  */
-const ANIMATION_SPEED = 0.35 // <1 slows animation (0.35 ~ ~3x slower)
-const HAIR_FILLER_COUNT = 40 // reduce filler curls for performance
-const MAX_ROT_Y = 0.35 // clamp horizontal rotation (radians)
-const MAX_ROT_X = 0.25 // clamp vertical rotation (radians)
+const ANIMATION_SPEED = 0.35
+const HAIR_FILLER_COUNT = 40
+const MAX_ROT_Y = 0.35
+const MAX_ROT_X = 0.25
+const HEAD_SCALE = 0.65
+const SCROLL_SENSITIVITY = 1.5
+const HAND_MOVEMENT_MULTIPLIER = 3.0 // Increased hand movement range
 
 function Head({ scrollRef }: HeadProps) {
   const group = useRef<THREE.Group | null>(null)
@@ -37,12 +40,12 @@ function Head({ scrollRef }: HeadProps) {
   const mouseTarget = useRef({ x: 0, y: 0 })
   const { viewport } = useThree()
 
-  // Hand input state (0 center, negative left, positive right)
+  // Hand input state - increased movement range
   const handTarget = useRef(0)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") handTarget.current = -0.45
-      if (e.key === "ArrowRight") handTarget.current = 0.45
+      if (e.key === "ArrowLeft") handTarget.current = -0.45 * HAND_MOVEMENT_MULTIPLIER
+      if (e.key === "ArrowRight") handTarget.current = 0.45 * HAND_MOVEMENT_MULTIPLIER
       if (e.key === "ArrowUp" || e.key === "ArrowDown") {
         /* optional: reuse for tilt later */
       }
@@ -58,24 +61,25 @@ function Head({ scrollRef }: HeadProps) {
     }
   }, [])
 
-  // Hair puffs: keep anchors, much fewer filler curls and only front hemisphere
+  // Hair puffs - only back of head, realistic density
   const hairPuffs = useMemo(() => {
     const puffs: { pos: [number, number, number]; r: number; tone: number }[] =
       []
 
+    // Back anchors only (z <= 0.1) - no front face hair
     const anchors: [number, number, number, number][] = [
-      [0.0, 0.95, 0.45, 0.36],
-      [-0.45, 0.92, 0.35, 0.34],
-      [0.45, 0.92, 0.35, 0.34],
-      [-0.7, 0.7, 0.15, 0.32],
-      [0.7, 0.7, 0.15, 0.32],
-      [0.0, 1.05, 0.05, 0.34],
+      [0.0, 0.95, -0.45, 0.36],
+      [-0.45, 0.92, -0.35, 0.34],
+      [0.45, 0.92, -0.35, 0.34],
+      [-0.7, 0.7, -0.15, 0.32],
+      [0.7, 0.7, -0.15, 0.32],
+      [0.0, 1.05, -0.55, 0.34],
     ]
     for (const [x, y, z, r] of anchors) {
       puffs.push({ pos: [x, y, z], r, tone: 0.95 + Math.random() * 0.06 })
     }
 
-    // fewer filler curls, only front-facing (z >= -0.2)
+    // Back-only filler curls (z <= 0)
     for (let i = 0; i < HAIR_FILLER_COUNT; i++) {
       const theta = Math.random() * Math.PI * 2
       const phi = Math.random() * Math.PI * 0.9
@@ -83,7 +87,10 @@ function Head({ scrollRef }: HeadProps) {
       const x = radius * Math.sin(phi) * Math.cos(theta)
       const y = radius * Math.cos(phi) + 0.08
       const z = radius * Math.sin(phi) * Math.sin(theta) - 0.03
-      if (z < -0.3) continue // hide deep-back puffs
+      
+      // Only back hemisphere (z <= 0.1)
+      if (z > 0.1) continue
+      
       puffs.push({
         pos: [x, y, z],
         r: 0.10 + Math.random() * 0.08,
@@ -91,12 +98,12 @@ function Head({ scrollRef }: HeadProps) {
       })
     }
 
-    // a few tight curls on top
+    // Tight curls on back top
     for (let i = 0; i < 12; i++) {
       const a = (i / 12) * Math.PI * 2
       const r = 0.45 + Math.random() * 0.18
       puffs.push({
-        pos: [Math.cos(a) * r, 1.05 + Math.random() * 0.06, Math.sin(a) * r * 0.6],
+        pos: [Math.cos(a) * r, 1.05 + Math.random() * 0.06, Math.sin(a) * r * -0.6],
         r: 0.07 + Math.random() * 0.03,
         tone: 0.92 + Math.random() * 0.12,
       })
@@ -106,12 +113,11 @@ function Head({ scrollRef }: HeadProps) {
   }, [])
 
   useFrame((state, delta) => {
-    // scaled delta for slower, stable animation and capped step to avoid jumps
     const rawDt = Math.min(delta, 0.05)
     const dt = rawDt * ANIMATION_SPEED
     const scroll = scrollRef.current
 
-    // pointer smoothing scaled to slower animation
+    // Pointer smoothing
     const px = (state.pointer.x * viewport.width) / 6
     const py = (state.pointer.y * viewport.height) / 6
     mouseTarget.current.x = THREE.MathUtils.damp(
@@ -127,10 +133,10 @@ function Head({ scrollRef }: HeadProps) {
       dt,
     )
 
-    // group follow scroll but clamped to front view
+    // Group follow scroll
     if (group.current) {
       const targetRotY = THREE.MathUtils.clamp(
-        scroll * Math.PI * 0.6,
+        scroll * Math.PI * 0.6 * SCROLL_SENSITIVITY,
         -MAX_ROT_Y,
         MAX_ROT_Y,
       )
@@ -174,7 +180,7 @@ function Head({ scrollRef }: HeadProps) {
       )
     }
 
-    // Eyes follow pointer with lighter stiffness
+    // Eyes follow pointer
     const eyeRot = mouseTarget.current.x * 0.25
     const eyeTilt = -mouseTarget.current.y * 0.16
     if (leftEye.current) {
@@ -206,7 +212,7 @@ function Head({ scrollRef }: HeadProps) {
       )
     }
 
-    // Hand follows keyboard target with smoothing
+    // Hand with increased movement
     if (handRef.current) {
       const hx = THREE.MathUtils.damp(
         handRef.current.position.x,
@@ -215,7 +221,6 @@ function Head({ scrollRef }: HeadProps) {
         dt,
       )
       handRef.current.position.x = hx
-      // small vertical bob to feel alive (slow)
       handRef.current.position.y = THREE.MathUtils.lerp(
         handRef.current.position.y,
         -0.15 + Math.sin(state.clock.getElapsedTime() * 0.6) * 0.01,
@@ -230,139 +235,179 @@ function Head({ scrollRef }: HeadProps) {
     }
   })
 
-  // Materials — simplified & efficient
-  const skinColor = "#f3b89a"
+  // Ultra-realistic materials
+  const skinColor = "#e8a574"
   const skin = (
     <meshStandardMaterial
       color={skinColor}
-      roughness={0.6}
-      metalness={0}
+      roughness={0.55}
+      metalness={0.01}
     />
   )
-  const skinNose = <meshStandardMaterial color="#eba88b" roughness={0.6} />
+  const skinNose = <meshStandardMaterial color="#d89565" roughness={0.58} />
   const cheekMat = (
-    <meshStandardMaterial color="#f08a76" roughness={0.8} transparent opacity={0.55} />
+    <meshStandardMaterial color="#e88a6a" roughness={0.75} transparent opacity={0.6} />
   )
-  const browMat = <meshStandardMaterial color="#2a1a10" roughness={0.8} />
-  const lipMat = <meshStandardMaterial color="#c4584b" roughness={0.6} />
-  const irisMat = <meshStandardMaterial color="#7a3e15" roughness={0.5} />
-  const pupilMat = <meshStandardMaterial color="#0b0703" roughness={0.2} />
-  const eyeWhite = <meshStandardMaterial color="#fbf8f2" roughness={0.28} />
+  const browMat = <meshStandardMaterial color="#1f1510" roughness={0.85} />
+  const mustacheMat = <meshStandardMaterial color="#3d2817" roughness={0.8} metalness={0.05} />
+  const lipMat = <meshStandardMaterial color="#c8655a" roughness={0.55} />
+  const irisMat = <meshStandardMaterial color="#6b3c1a" roughness={0.45} />
+  const pupilMat = <meshStandardMaterial color="#1a1410" roughness={0.15} />
+  const eyeWhite = <meshStandardMaterial color="#f5f2ec" roughness={0.25} />
 
   return (
     <group ref={group} position={[0, -0.05, 0]}>
-      <group ref={headPivot}>
-        {/* Head - reduced segments for performance */}
-        <mesh castShadow receiveShadow scale={[1.0, 1.06, 1.0]}>
+      <group ref={headPivot} scale={HEAD_SCALE}>
+        {/* Head - realistic proportions */}
+        <mesh castShadow receiveShadow scale={[1.0, 1.08, 0.95]}>
+          <sphereGeometry args={[1, 40, 40]} />
+          {skin}
+        </mesh>
+
+        {/* Jaw - realistic */}
+        <mesh position={[0, -0.6, 0.2]} scale={[0.68, 0.48, 0.68]}>
           <sphereGeometry args={[1, 32, 32]} />
           {skin}
         </mesh>
 
-        {/* Jaw */}
-        <mesh position={[0, -0.55, 0.25]} scale={[0.7, 0.5, 0.7]}>
-          <sphereGeometry args={[1, 28, 28]} />
-          {skin}
-        </mesh>
-
-        {/* Cheeks */}
-        <mesh position={[-0.5, -0.1, 0.78]} rotation={[0, -0.4, 0]} scale={[0.18, 0.13, 0.04]}>
-          <sphereGeometry args={[1, 20, 20]} />
+        {/* Cheeks - subtle blush */}
+        <mesh position={[-0.5, -0.05, 0.82]} rotation={[0, -0.4, 0]} scale={[0.17, 0.12, 0.035]}>
+          <sphereGeometry args={[1, 24, 24]} />
           {cheekMat}
         </mesh>
-        <mesh position={[0.5, -0.1, 0.78]} rotation={[0, 0.4, 0]} scale={[0.18, 0.13, 0.04]}>
-          <sphereGeometry args={[1, 20, 20]} />
+        <mesh position={[0.5, -0.05, 0.82]} rotation={[0, 0.4, 0]} scale={[0.17, 0.12, 0.035]}>
+          <sphereGeometry args={[1, 24, 24]} />
           {cheekMat}
         </mesh>
 
-        {/* Brows */}
-        <mesh position={[-0.3, 0.42, 0.92]} rotation={[0, -0.05, 0.18]} scale={[0.22, 0.06, 0.06]}>
+        {/* Brows - detailed */}
+        <mesh position={[-0.32, 0.4, 0.9]} rotation={[0, -0.08, 0.2]} scale={[0.24, 0.06, 0.06]}>
           <sphereGeometry args={[1, 20, 20]} />
           {browMat}
         </mesh>
-        <mesh position={[0.3, 0.42, 0.92]} rotation={[0, 0.05, -0.18]} scale={[0.22, 0.06, 0.06]}>
+        <mesh position={[0.32, 0.4, 0.9]} rotation={[0, 0.08, -0.2]} scale={[0.24, 0.06, 0.06]}>
           <sphereGeometry args={[1, 20, 20]} />
           {browMat}
         </mesh>
 
-        {/* Eyes (kept simple) */}
-        <group ref={leftEye} position={[-0.3, 0.22, 0.85]}>
+        {/* Eyes - realistic and detailed */}
+        <group ref={leftEye} position={[-0.3, 0.22, 0.88]}>
           <mesh>
-            <sphereGeometry args={[0.18, 28, 28]} />
+            <sphereGeometry args={[0.165, 32, 32]} />
             {eyeWhite}
           </mesh>
-          <mesh position={[0, -0.005, 0.13]}>
-            <sphereGeometry args={[0.105, 20, 20]} />
+          <mesh position={[0, -0.008, 0.128]}>
+            <sphereGeometry args={[0.1, 24, 24]} />
             {irisMat}
           </mesh>
-          <mesh position={[0, -0.005, 0.165]}>
-            <sphereGeometry args={[0.06, 16, 16]} />
+          <mesh position={[0, -0.008, 0.165]}>
+            <sphereGeometry args={[0.058, 18, 18]} />
             {pupilMat}
+          </mesh>
+          <mesh position={[0.02, 0.015, 0.19]}>
+            <sphereGeometry args={[0.015, 8, 8]} />
+            <meshStandardMaterial color="#ffffff" metalness={0.8} roughness={0.1} />
           </mesh>
         </group>
 
-        <group ref={rightEye} position={[0.3, 0.22, 0.85]}>
+        <group ref={rightEye} position={[0.3, 0.22, 0.88]}>
           <mesh>
-            <sphereGeometry args={[0.18, 28, 28]} />
+            <sphereGeometry args={[0.165, 32, 32]} />
             {eyeWhite}
           </mesh>
-          <mesh position={[0, -0.005, 0.13]}>
-            <sphereGeometry args={[0.105, 20, 20]} />
+          <mesh position={[0, -0.008, 0.128]}>
+            <sphereGeometry args={[0.1, 24, 24]} />
             {irisMat}
           </mesh>
-          <mesh position={[0, -0.005, 0.165]}>
-            <sphereGeometry args={[0.06, 16, 16]} />
+          <mesh position={[0, -0.008, 0.165]}>
+            <sphereGeometry args={[0.058, 18, 18]} />
             {pupilMat}
+          </mesh>
+          <mesh position={[-0.02, 0.015, 0.19]}>
+            <sphereGeometry args={[0.015, 8, 8]} />
+            <meshStandardMaterial color="#ffffff" metalness={0.8} roughness={0.1} />
           </mesh>
         </group>
 
-        {/* Nose */}
-        <mesh position={[0, 0.0, 1.0]} scale={[0.085, 0.075, 0.085]}>
-          <sphereGeometry args={[1, 18, 18]} />
+        {/* Nose - detailed */}
+        <mesh position={[0, -0.02, 1.02]} scale={[0.082, 0.072, 0.082]}>
+          <sphereGeometry args={[1, 22, 22]} />
           {skinNose}
         </mesh>
 
-        {/* Smile */}
-        <mesh position={[0, -0.27, 0.92]} rotation={[Math.PI / 2 - 0.25, 0, 0]} scale={[1, 1, 0.55]}>
-          <torusGeometry args={[0.11, 0.018, 8, 24, Math.PI]} />
+        {/* Nostrils */}
+        <mesh position={[-0.08, -0.08, 1.08]} scale={[0.02, 0.018, 0.015]}>
+          <sphereGeometry args={[1, 12, 12]} />
+          <meshStandardMaterial color="#8b5a3c" roughness={0.9} />
+        </mesh>
+        <mesh position={[0.08, -0.08, 1.08]} scale={[0.02, 0.018, 0.015]}>
+          <sphereGeometry args={[1, 12, 12]} />
+          <meshStandardMaterial color="#8b5a3c" roughness={0.9} />
+        </mesh>
+
+        {/* Realistic Mustache - replaces front hair */}
+        <mesh position={[0, -0.08, 1.0]} rotation={[0, 0, 0]}>
+          <torusGeometry args={[0.18, 0.022, 8, 32]} />
+          {mustacheMat}
+        </mesh>
+        {/* Mustache curl left */}
+        <mesh position={[-0.2, -0.06, 0.95]} rotation={[0, 0.3, -0.1]}>
+          <torusGeometry args={[0.08, 0.018, 6, 20]} />
+          {mustacheMat}
+        </mesh>
+        {/* Mustache curl right */}
+        <mesh position={[0.2, -0.06, 0.95]} rotation={[0, -0.3, 0.1]}>
+          <torusGeometry args={[0.08, 0.018, 6, 20]} />
+          {mustacheMat}
+        </mesh>
+
+        {/* Lips */}
+        <mesh position={[0, -0.28, 0.92]} rotation={[Math.PI / 2 - 0.25, 0, 0]} scale={[0.98, 0.98, 0.52]}>
+          <torusGeometry args={[0.11, 0.02, 8, 28, Math.PI]} />
           {lipMat}
         </mesh>
 
-        {/* Front-only bouncy hair (reduced complexity) */}
+        {/* Back-of-head hair only */}
         {hairPuffs.map((p, i) => (
           <mesh key={`h-${i}`} position={p.pos} castShadow>
-            <sphereGeometry args={[p.r, 12, 12]} />
+            <sphereGeometry args={[p.r, 14, 14]} />
             <meshStandardMaterial
-              color={p.tone < 1 ? "#3a2110" : "#4a2a18"}
-              roughness={0.85}
-              metalness={0.02}
+              color={p.tone < 1 ? "#2d1a0f" : "#3d2817"}
+              roughness={0.82}
+              metalness={0.03}
             />
           </mesh>
         ))}
 
-        {/* Simple hand mesh that follows arrow keys */}
+        {/* Extended hand mesh with increased movement */}
         <group ref={handRef} position={[0, -0.15, 0.9]}>
           <mesh position={[0.35, 0, 0]} rotation={[0, 0, -0.2]}>
-            <boxGeometry args={[0.18, 0.06, 0.06]} />
-            <meshStandardMaterial color="#f3b89a" roughness={0.7} />
+            <boxGeometry args={[0.22, 0.08, 0.08]} />
+            <meshStandardMaterial color="#e8a574" roughness={0.68} />
           </mesh>
-          {/* small thumb */}
-          <mesh position={[0.48, 0.02, 0.02]} rotation={[0, 0, 0.2]}>
-            <boxGeometry args={[0.06, 0.02, 0.02]} />
-            <meshStandardMaterial color="#f3b89a" roughness={0.7} />
+          {/* thumb */}
+          <mesh position={[0.52, 0.025, 0.025]} rotation={[0, 0, 0.25]}>
+            <boxGeometry args={[0.08, 0.025, 0.025]} />
+            <meshStandardMaterial color="#e8a574" roughness={0.68} />
+          </mesh>
+          {/* fingers */}
+          <mesh position={[0.55, -0.02, -0.02]} rotation={[0.15, 0, -0.1]}>
+            <boxGeometry args={[0.06, 0.04, 0.03]} />
+            <meshStandardMaterial color="#e8a574" roughness={0.68} />
           </mesh>
         </group>
       </group>
 
-      {/* Neck */}
-      <mesh position={[0, -1.05, 0.15]}>
-        <cylinderGeometry args={[0.32, 0.36, 0.45, 16]} />
+      {/* Neck - improved */}
+      <mesh position={[0, -1.05, 0.12]} scale={HEAD_SCALE}>
+        <cylinderGeometry args={[0.34, 0.38, 0.5, 20]} />
         {skin}
       </mesh>
 
-      {/* Soft rim glow behind head */}
+      {/* Soft rim glow */}
       <mesh position={[0, 0.1, -1.6]}>
         <circleGeometry args={[1.7, 32]} />
-        <meshBasicMaterial color="#10b981" transparent opacity={0.06} />
+        <meshBasicMaterial color="#10b981" transparent opacity={0.08} />
       </mesh>
     </group>
   )
@@ -373,38 +418,37 @@ export function IdentityScene({
 }: {
   scrollRef: React.MutableRefObject<number>
 }) {
-  // Lower DPR to save mobile GPU cycles
   return (
     <Canvas
       shadows={false}
-      dpr={[1, 1.2]}
+      dpr={[1, 1.5]}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       style={{ background: "transparent" }}
     >
       <PerspectiveCamera makeDefault position={[0, 0.12, 3.8]} fov={34} />
 
-      {/* Lightweight lights */}
-      <ambientLight intensity={0.48} />
-      <directionalLight position={[2.5, 4, 3]} intensity={1.0} />
-      <pointLight position={[-2.5, 1.2, -1.2]} intensity={1.2} color="#10b981" />
-      <pointLight position={[2, -0.8, 1.8]} intensity={0.6} color="#fde7d2" />
+      {/* Enhanced lighting for realism */}
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[3, 4.5, 3.5]} intensity={1.1} castShadow />
+      <pointLight position={[-2.5, 1.5, -1]} intensity={1.3} color="#10b981" />
+      <pointLight position={[2.2, -0.6, 2]} intensity={0.7} color="#fde7d2" />
+      <pointLight position={[0, 0.5, 2.5]} intensity={0.4} color="#fff5f0" />
 
       <Suspense fallback={null}>
-        {/* Float slowed down for performance + subtle movement */}
         <Float speed={0.18} rotationIntensity={0.02} floatIntensity={0.06}>
           <Head scrollRef={scrollRef} />
         </Float>
 
         <ContactShadows
           position={[0, -1.6, 0]}
-          opacity={0.35}
-          scale={7}
-          blur={2}
-          far={2.5}
+          opacity={0.4}
+          scale={8}
+          blur={2.5}
+          far={3}
           color="#000000"
         />
 
-        <Environment preset="studio" environmentIntensity={0.45} />
+        <Environment preset="studio" environmentIntensity={0.5} />
       </Suspense>
     </Canvas>
   )
