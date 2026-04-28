@@ -18,18 +18,19 @@ type HeadProps = {
 
 /**
  * Super realistic identity scene:
- * - increased hand movement with arrow keys (3x multiplier)
- * - removed front face hair completely
+ * - zero front face hair (completely clean face)
+ * - hair only on back of head (z < -0.5)
  * - added realistic mustache only
  * - hyper-realistic proportions and textures
  * - enhanced lighting for depth
+ * - 10% scroll range only
  */
 const ANIMATION_SPEED = 0.35
-const HAIR_FILLER_COUNT = 0 // No front face hair
+const HAIR_FILLER_COUNT = 0 // No front face hair - ZERO
 const MAX_ROT_Y = 0.35
 const MAX_ROT_X = 0.25
 const HEAD_SCALE = 0.65
-const SCROLL_SENSITIVITY = 1.5
+const SCROLL_SENSITIVITY = 0.1 // Reduced to 10% (was 1.5)
 const HAND_MOVEMENT_MULTIPLIER = 3.0
 
 function Head({ scrollRef }: HeadProps) {
@@ -62,37 +63,40 @@ function Head({ scrollRef }: HeadProps) {
     }
   }, [])
 
-  // Hair puffs - ONLY back of head, NO front face hair
+  // Hair puffs - ONLY back of head (z < -0.5), ZERO front face hair
   const hairPuffs = useMemo(() => {
     const puffs: { pos: [number, number, number]; r: number; tone: number }[] =
       []
 
-    // Back anchors only - strictly back hemisphere (z < -0.3)
+    // Back anchors ONLY - strictly deep back (z < -0.5)
     const anchors: [number, number, number, number][] = [
-      [0.0, 0.95, -0.55, 0.36],
-      [-0.5, 0.88, -0.45, 0.34],
-      [0.5, 0.88, -0.45, 0.34],
-      [-0.75, 0.65, -0.35, 0.32],
-      [0.75, 0.65, -0.35, 0.32],
-      [0.0, 1.1, -0.65, 0.34],
-      [-0.3, 1.05, -0.6, 0.3],
-      [0.3, 1.05, -0.6, 0.3],
+      [0.0, 0.95, -0.65, 0.36],
+      [-0.5, 0.88, -0.6, 0.34],
+      [0.5, 0.88, -0.6, 0.34],
+      [-0.75, 0.65, -0.55, 0.32],
+      [0.75, 0.65, -0.55, 0.32],
+      [0.0, 1.1, -0.75, 0.34],
+      [-0.3, 1.05, -0.7, 0.3],
+      [0.3, 1.05, -0.7, 0.3],
     ]
     for (const [x, y, z, r] of anchors) {
-      puffs.push({ pos: [x, y, z], r, tone: 0.95 + Math.random() * 0.06 })
+      // Double check: only if z < -0.5
+      if (z < -0.5) {
+        puffs.push({ pos: [x, y, z], r, tone: 0.95 + Math.random() * 0.06 })
+      }
     }
 
-    // Back-only filler curls - strictly z < -0.2
-    for (let i = 0; i < 30; i++) {
+    // Back-only filler curls - strictly z < -0.5 (deep back only)
+    for (let i = 0; i < 25; i++) {
       const theta = Math.random() * Math.PI * 2
       const phi = Math.random() * Math.PI * 0.85
       const radius = 1.0 + Math.random() * 0.15
       const x = radius * Math.sin(phi) * Math.cos(theta)
       const y = radius * Math.cos(phi) + 0.1
-      const z = -(radius * Math.sin(phi) * Math.sin(theta) + 0.4) // Force back
+      const z = -(radius * Math.sin(phi) * Math.sin(theta) + 0.6) // Force very back
       
-      // Only deep back hemisphere
-      if (z > -0.2) continue
+      // Only deep back hemisphere (z < -0.5)
+      if (z > -0.5) continue
       
       puffs.push({
         pos: [x, y, z],
@@ -101,15 +105,20 @@ function Head({ scrollRef }: HeadProps) {
       })
     }
 
-    // Tight curls on back top only
-    for (let i = 0; i < 14; i++) {
-      const a = (i / 14) * Math.PI * 2
+    // Tight curls on back top only (z < -0.5)
+    for (let i = 0; i < 12; i++) {
+      const a = (i / 12) * Math.PI * 2
       const r = 0.5 + Math.random() * 0.15
-      puffs.push({
-        pos: [Math.cos(a) * r, 1.08 + Math.random() * 0.08, -Math.sin(a) * r * 0.75],
-        r: 0.08 + Math.random() * 0.04,
-        tone: 0.92 + Math.random() * 0.12,
-      })
+      const puffZ = -Math.sin(a) * r * 0.85
+      
+      // Only add if z < -0.5
+      if (puffZ < -0.5) {
+        puffs.push({
+          pos: [Math.cos(a) * r, 1.08 + Math.random() * 0.08, puffZ],
+          r: 0.08 + Math.random() * 0.04,
+          tone: 0.92 + Math.random() * 0.12,
+        })
+      }
     }
 
     return puffs
@@ -136,14 +145,14 @@ function Head({ scrollRef }: HeadProps) {
       dt,
     )
 
-    // Group follow scroll - shorter range
+    // Group follow scroll - 10% only
     if (group.current) {
       const targetRotY = THREE.MathUtils.clamp(
-        scroll * Math.PI * 0.4 * SCROLL_SENSITIVITY, // Reduced from 0.6
-        -MAX_ROT_Y,
-        MAX_ROT_Y,
+        scroll * Math.PI * 0.4 * SCROLL_SENSITIVITY, // 10% sensitivity
+        -MAX_ROT_Y * 0.1, // 10% max rotation
+        MAX_ROT_Y * 0.1,
       )
-      const targetZ = -0.15 + scroll * 0.15 // Reduced movement
+      const targetZ = -0.15 + scroll * 0.015 // 10% movement
       group.current.rotation.y = THREE.MathUtils.damp(
         group.current.rotation.y,
         targetRotY,
@@ -370,8 +379,8 @@ function Head({ scrollRef }: HeadProps) {
           {lipMat}
         </mesh>
 
-        {/* Back-of-head hair ONLY - strictly no front face */}
-        {hairPuffs.map((p, i) => (
+        {/* Back-of-head hair ONLY (z < -0.5) - strictly no front face */}
+        {hairPuffs.length > 0 && hairPuffs.map((p, i) => (
           <mesh key={`h-${i}`} position={p.pos} castShadow>
             <sphereGeometry args={[p.r, 14, 14]} />
             <meshStandardMaterial
