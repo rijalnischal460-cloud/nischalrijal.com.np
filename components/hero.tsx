@@ -27,7 +27,6 @@ export function Hero() {
     }
 
     const tick = () => {
-      // Smooth lerp toward target — buttery, no jitter.
       scrollRef.current += (targetRef.current - scrollRef.current) * 0.08
       rafRef.current = requestAnimationFrame(tick)
     }
@@ -48,13 +47,10 @@ export function Hero() {
       className="relative h-[200vh] w-full"
       aria-label="Hero"
     >
-      {/* Sticky stage */}
       <div className="sticky top-0 flex h-screen w-full items-center justify-center overflow-hidden">
-        {/* Ambient gradient backdrop */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(16,185,129,0.10),_transparent_60%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,_rgba(255,255,255,0.04),_transparent_50%)]" />
-          {/* Grid lines */}
           <div
             className="absolute inset-0 opacity-[0.06]"
             style={{
@@ -67,21 +63,18 @@ export function Hero() {
           />
         </div>
 
-        {/* 3D canvas */}
         <div className="absolute inset-0">
           <IdentityScene scrollRef={scrollRef} />
         </div>
 
-        {/* Text overlay */}
         <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-6 text-center">
-          {/* Floating badge */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="animate-float-soft"
           >
-            <div className="glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] uppercase tracking-[0.22em] text-white/80">
+            <div className="glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] uppercase tracking-[0.22em] text-black">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#10b981] opacity-60" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-[#10b981]" />
@@ -95,7 +88,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.55, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-6 font-serif text-[48px] leading-[1.02] tracking-tight text-balance text-white sm:text-[72px] md:text-[96px] lg:text-[120px]"
+            className="mt-6 font-serif text-[48px] leading-[1.02] tracking-tight text-balance text-black sm:text-[72px] md:text-[96px] lg:text-[120px]"
           >
             Nischal Rijal
           </motion.h1>
@@ -104,7 +97,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.75, duration: 0.9 }}
-            className="mt-4 text-[11px] uppercase tracking-[0.42em] text-white/55 sm:text-xs"
+            className="mt-4 text-[11px] uppercase tracking-[0.42em] text-black sm:text-xs"
           >
             2nd Year Software Engineering Student · Nepal
           </motion.p>
@@ -138,7 +131,6 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Scroll cue */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -157,7 +149,6 @@ export function Hero() {
           </div>
         </motion.div>
 
-        {/* Bottom fade */}
         <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-[#0a0b0a]" />
       </div>
     </section>
