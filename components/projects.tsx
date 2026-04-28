@@ -1,6 +1,3 @@
-"use client"
-
-import { motion, useReducedMotion } from "framer-motion"
 import { ArrowUpRight, Activity } from "lucide-react"
 
 type Metric = {
@@ -56,8 +53,8 @@ export function Projects() {
         </div>
 
         <div className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-2">
-          {projects.map((p, i) => (
-            <ProjectCard key={p.id} project={p} index={i} />
+          {projects.map((p) => (
+            <ProjectCard key={p.id} project={p} />
           ))}
         </div>
       </div>
@@ -65,17 +62,9 @@ export function Projects() {
   )
 }
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
-  const reduceMotion = useReducedMotion()
-
+function ProjectCard({ project }: { project: Project }) {
   return (
-    <motion.article
-      initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.45, delay: index * 0.04 }}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/8 bg-gradient-to-b from-white/[0.04] to-transparent p-7 transition-colors duration-300 hover:border-[#10b981]/30"
-    >
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/8 bg-gradient-to-b from-white/[0.04] to-transparent p-7 transition-colors duration-200 hover:border-[#10b981]/30 [content-visibility:auto] [contain-intrinsic-size:1px_600px]">
       <div className="relative flex items-center justify-between">
         <span className="text-[10px] uppercase tracking-[0.32em] text-white/35">{project.category}</span>
         <span className="text-[10px] uppercase tracking-[0.32em] text-white/35">{project.year}</span>
@@ -128,7 +117,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           GitHub <ArrowUpRight className="h-4 w-4" />
         </a>
       )}
-    </motion.article>
+    </article>
   )
 }
 
